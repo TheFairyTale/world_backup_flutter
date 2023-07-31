@@ -17,8 +17,8 @@ class _ConfigJsonReadWidgetState extends State<ConfigJsonReadWidget> {
   static String configDirPath = "";
 
   /// 初始化获取配置文件所在目录
-  void initConfig() async {
-    await FutureBuilder<Directory?>(
+  Widget initConfig() {
+    return FutureBuilder<Directory?>(
       future: getApplicationDocumentsDirectory(),
       builder: _buildDirectory,
     );
@@ -45,5 +45,11 @@ class _ConfigJsonReadWidgetState extends State<ConfigJsonReadWidget> {
     }
     configDirPath = text;
     return Padding(padding: const EdgeInsets.all(16.0), child: Text(text));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return initConfig();
   }
 }

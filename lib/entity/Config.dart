@@ -12,16 +12,16 @@ class Config {
       this.backupInterview = ""});
 
   factory Config.fromJson(Map<String, dynamic> json) {
-    json['backupInterview'];
-    json['worldFolderPath'];
-    json['backupFolderPath'];
-    if () {
+    String backupInterview = json['backupInterview'];
+    String worldFolderPath = json['worldFolderPath'];
+    String backupFolderPath = json['backupFolderPath'];
+    // if () {
 
-    }
+    // }
 
     return Config(
-        backupFolderPath: ,
-        worldFolderPath: ,
-        backupInterview: );
+        backupFolderPath: backupFolderPath,
+        worldFolderPath: worldFolderPath,
+        backupInterview: backupFolderPath);
   }
 }

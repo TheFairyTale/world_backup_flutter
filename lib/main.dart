@@ -4,6 +4,7 @@ import 'dart:ffi';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_demo/widgets/ConfigJsonReadWidget.dart';
 
 void main() {
   runApp(const MyApp());
@@ -83,6 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void updateWidgetListVarStatus(List<Widget> widgetList) {
     setState(() {
       widgetsOfFiles = widgetList;
+      widgetsOfFiles.add(ConfigJsonReadWidget());
     });
   }
 
@@ -113,10 +115,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   /// 读取程序目录下的配置文件
-  Future<Map<String, dynamic>> getLocalJson(String jsonName) async {
-    // Map<String, dynamic> map = jsonDecode(
-    //     await rootBundle.loadString("assets/json/" + jsonName + ".json"));
-    json
-    return map;
-  }
+  // Future<Map<String, dynamic>> getLocalJson(String jsonName) async {
+  //   // Map<String, dynamic> map = jsonDecode(
+  //   //     await rootBundle.loadString("assets/json/" + jsonName + ".json"));
+  //   json
+  //   return map;
+  // }
 }
