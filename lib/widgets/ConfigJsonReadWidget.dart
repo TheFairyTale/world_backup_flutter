@@ -33,6 +33,7 @@ class _ConfigJsonReadWidgetState extends State<ConfigJsonReadWidget> {
         print('Error: ${snapshot.error}');
       } else if (snapshot.hasData) {
         print('path: ${snapshot.data!.path}');
+        // C:\Users\Administrator\Documents\WorldBackupFlutter\config
         Directory directory =
             Directory(snapshot.data!.path + "\\WorldBackupFlutter\\config");
         directory.createSync(recursive: true);
