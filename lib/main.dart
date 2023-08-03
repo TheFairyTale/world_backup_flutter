@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
 
+import 'package:archive/archive.dart';
+import 'package:archive/archive_io.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_demo/widgets/ConfigJsonReadWidget.dart';
 
@@ -36,6 +38,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
+  int currentPageIndex = 1;
   int _counter = 0;
   var streamController;
   // 获取StreamSink用于发射事件
@@ -49,6 +52,13 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   @override
   void initState() {
     streamController = StreamController<String>();
+    // Future(() {
+    //   return zipEncoder();
+    // }).then((value) {
+    //   print("zip complete.");
+    // }).whenComplete(() {
+    //   print("已调用");
+    // });
 
     /// [AnimationController]s can be created with `vsync: this` because of
     /// [TickerProviderStateMixin].
@@ -62,6 +72,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     setState(() {
       initFirstPageWidgets();
     });
+
     initScanDirectory();
     super.initState();
   }
@@ -74,8 +85,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    int currentPageIndex = 0;
-
     // widgetsOfFiles.add(Text(
     //   '$_counter',
     //   style: Theme.of(context).textTheme.headlineMedium,
@@ -93,20 +102,37 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         scrollDirection: Axis.vertical,
         children: [
           const Text("第二页"),
+          Card(
+              margin: const EdgeInsets.all(12.0),
+              elevation: 0,
+              color: Theme.of(context).colorScheme.surfaceVariant,
+              child: Padding(
+                padding: EdgeInsets.all(12.0),
+                child: const SizedBox(
+                  height: 40,
+                  child: Text("D:/Program Files/DBeaver/"),
+                ),
+              ))
         ],
       ),
     );
     // 第三页
     Widget thirdPageWidget = Container(
       child: Card(
-        child: ListView(
-          children: [
-            const Text("第3页"),
-          ],
+        margin: const EdgeInsets.all(12.0),
+        elevation: 0,
+        color: Theme.of(context).colorScheme.surfaceVariant,
+        child: Padding(
+          padding: EdgeInsets.all(12.0),
+          child: ListView(
+            children: [
+              const Text("第3页"),
+            ],
+          ),
         ),
       ),
     );
-    // 添加可被底部导航栏点击的Widget 页面
+    // 添加可被底部导航栏进行切换的Widget 页面
     List<Widget> pages = [homePageWidget, secondPageWidget, thirdPageWidget];
 
     return Scaffold(
@@ -115,14 +141,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         title: Text(widget.title),
       ),
       body: pages[currentPageIndex],
-
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
           print("selected.");
 
           setState(() {
             currentPageIndex = index;
-            initFirstPageWidgets();
           });
 
           print(currentPageIndex);
@@ -228,6 +252,19 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
             ],
           ),
         )));
+  }
+
+  void zipEncoder() async {
+    var zipFileEncoder = ZipFileEncoder();
+    String dirPathString =
+        "D:\\Users\\Administrator\\Downloads\\TheMinecraft\\.minecraft\\saves\\新的世界，崭新的生活！";
+    if (!dirPathString.endsWith("\\")) {
+      dirPathString += "\\";
+    }
+    print("Path -> " + dirPathString);
+    zipFileEncoder.zipDirectory(Directory(dirPathString),
+        level: Deflate.BEST_COMPRESSION,
+        filename: 'D:\\Users\\Administrator\\Downloads\\out.zip');
   }
 
   /// 读取程序目录下的配置文件
