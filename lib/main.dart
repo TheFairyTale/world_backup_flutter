@@ -7,6 +7,7 @@ import 'package:archive/archive.dart';
 import 'package:archive/archive_io.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_demo/widgets/ConfigJsonReadWidget.dart';
+import 'package:path/path.dart' as path;
 
 void main() {
   runApp(const MyApp());
@@ -49,6 +50,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   late AnimationController animationController;
   List<Widget> widgetsOfFiles = [];
 
+  // todo 某些内容不应放在init 生命周期内
   @override
   void initState() {
     streamController = StreamController<String>();
@@ -100,20 +102,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     Widget secondPageWidget = Container(
       child: ListView(
         scrollDirection: Axis.vertical,
-        children: [
-          const Text("第二页"),
-          Card(
-              margin: const EdgeInsets.all(12.0),
-              elevation: 0,
-              color: Theme.of(context).colorScheme.surfaceVariant,
-              child: Padding(
-                padding: EdgeInsets.all(12.0),
-                child: const SizedBox(
-                  height: 40,
-                  child: Text("D:/Program Files/DBeaver/"),
-                ),
-              ))
-        ],
+        children: widgetsOfFiles,
       ),
     );
     // 第三页
@@ -197,14 +186,14 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   void updateWidgetListVarStatus(List<Widget> widgetList) {
     setState(() {
       widgetsOfFiles = widgetList;
-      widgetsOfFiles.add(ConfigJsonReadWidget());
+      // widgetsOfFiles.add(ConfigJsonReadWidget());
     });
   }
 
   /// 扫描指定目录下的文件及文件夹
   void initScanDirectory() {
     String dirPath =
-        "C:\\Users\\Administrator\\Documents\\Flutter\\flutter_demo";
+        "C:\\Users\\Administrator\\Documents\\Flutter\\world_backup_flutter";
     Directory dirObj = Directory(dirPath);
     List<Widget> widgets = [];
 
@@ -212,8 +201,66 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       if (value) {
         // 存在
         dirObj.list(recursive: true, followLinks: false).forEach((element) {
+          // Stream<FileSystemEntity> filesInPath = dirObj.list(recursive: true, followLinks: false);
+          // for (var element in filesInPath) {
+
+          // }
+          // .forEach((element) {
+
           if (element is File) {
-            widgets.add(Text(element.toString()));
+            File eleFile = element;
+            String fileExtension = path.extension(path.basename(eleFile.path));
+            if (!fileExtension.contains('zip')) {
+              // continue;
+            }
+
+            widgets.add(Card(
+              margin: const EdgeInsets.all(12.0),
+              elevation: 0,
+              color: Theme.of(context).colorScheme.surfaceVariant,
+              child: Padding(
+                padding: EdgeInsets.all(12.0),
+                child: Column(
+                  children: [
+                    Padding(
+                        padding: const EdgeInsets.only(bottom: 12.0),
+                        child: Row(children: [
+                          const Icon(Icons.folder_zip_outlined),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 12.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    child: Text(path.basename(eleFile.path)),
+                                  ),
+                                  SizedBox(
+                                    child: Text(
+                                      eleFile.path,
+                                      style: const TextStyle(
+                                          color: Colors.blueGrey),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ])),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        FilledButton.icon(
+                            onPressed: () {},
+                            icon: Icon(Icons.open_in_new_off_outlined),
+                            label: Text("打开文件"))
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ));
           }
         });
       }
