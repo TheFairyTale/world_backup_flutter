@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:archive/archive.dart';
 import 'package:archive/archive_io.dart';
@@ -48,6 +49,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   Stream<String> get streamData => streamController.stream;
   // 用于首页第一张卡片显示文件备份进度的动画控制器
   late AnimationController animationController;
+  // 第二页已备份文件列表
   List<Widget> widgetsOfFiles = [];
 
   // todo 某些内容不应放在init 生命周期内
@@ -71,9 +73,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
             print("invoked");
             setState(() {});
           });
-    setState(() {
-      initFirstPageWidgets();
-    });
+    setState(() {});
 
     initScanDirectory();
     super.initState();
@@ -94,8 +94,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     // 主页
     Widget homePageWidget = Container(
       child: ListView(
-        scrollDirection: Axis.vertical,
-        children: widgetsOfFiles,
+        // scrollDirection: Axis.vertical,
+        children: homePageWidgets(),
       ),
     );
     // 第二页
@@ -253,8 +253,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                       children: [
                         FilledButton.icon(
                             onPressed: () {},
-                            icon: Icon(Icons.open_in_new_off_outlined),
-                            label: Text("打开文件"))
+                            icon: const Icon(Icons.open_in_new_outlined),
+                            label: const Text("打开文件"))
                       ],
                     )
                   ],
@@ -271,34 +271,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   /// 判断目录是否是有效的
   Future<bool> doesDirectoryExists(Directory dirObj) async {
+    // todo
     return dirObj.exists();
-  }
-
-  void initFirstPageWidgets() {
-    widgetsOfFiles.add(Card(
-        margin: const EdgeInsets.all(12.0),
-        child: Padding(
-          padding: EdgeInsets.all(12.0),
-          child: Row(
-            // mainAxisSize: MainAxisSize.min,
-            children: [
-              Expanded(
-                child: Row(children: [
-                  const Text("当前正在进行的任务:"),
-                ]),
-              ),
-              Expanded(
-                child: Container(
-                  alignment: Alignment.center,
-                  child: LinearProgressIndicator(
-                    value: animationController.value,
-                    semanticsLabel: '压缩: temp.zip 文件',
-                  ),
-                ),
-              ),
-            ],
-          ),
-        )));
   }
 
   void zipEncoder() async {
@@ -314,6 +288,106 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         filename: 'D:\\Users\\Administrator\\Downloads\\out.zip');
   }
 
+  /// Column里面嵌套Column、ListView、EasyRefresh等空间具有无限延展性等控件，
+  /// 每一层都需要用Expanded包裹，漏掉一层都不行
+  /// ->
+  /// 只要每层可无限延展的控件外面都套上Expanded，允许他们最大值延展，那就没问题。
+
+  List<Widget> homePageWidgets() {
+    return <Widget>[
+      Card(
+        margin: const EdgeInsets.all(12.0),
+        elevation: 0,
+        color: Theme.of(context).colorScheme.surfaceVariant,
+        child: Padding(
+          padding: EdgeInsets.all(12.0),
+          child: Expanded(
+            child: Column(
+              // 将文字或列表内容移至开头
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(bottom: 6.0),
+                  child: SizedBox(
+                    child: const Text(
+                      "当前正在进行的任务:",
+                      textAlign: TextAlign.start,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 6.0),
+                  child: SizedBox(
+                    child: Row(
+                      // alignment: Alignment.center,
+                      children: [
+                        Expanded(
+                            child: LinearProgressIndicator(
+                          value: 0.2,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.inversePrimary,
+                          color: Theme.of(context).colorScheme.primary,
+                          // color: Theme.of(context).colorScheme.inverseSurface,
+                          semanticsLabel: '压缩: temp.zip 文件',
+                        ))
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      Card(
+        margin: const EdgeInsets.all(12.0),
+        elevation: 0,
+        color: Theme.of(context).colorScheme.surfaceVariant,
+        child: Padding(
+          padding: EdgeInsets.all(12.0),
+          child: Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(bottom: 6.0),
+                  child: SizedBox(
+                    child: const Text(
+                      "手动备份:",
+                      textAlign: TextAlign.start,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 6.0),
+                  child: SizedBox(
+                    child: Row(
+                      // alignment: Alignment.center,
+                      children: [],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 6.0),
+                  child: SizedBox(
+                    child: Row(
+                      children: [
+                        OutlinedButton.icon(
+                            onPressed: () {},
+                            icon: const Icon(Icons.folder_zip_outlined),
+                            label: Text("开始备份文件"))
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ];
+  }
+
   /// 读取程序目录下的配置文件
   // Future<Map<String, dynamic>> getLocalJson(String jsonName) async {
   //   // Map<String, dynamic> map = jsonDecode(
@@ -321,4 +395,24 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   //   json
   //   return map;
   // }
+
+  /// 压缩指定目录下的文件
+  /// todo: 1 先实现扫描指定目录下所有文件所占总和空间
+  /// todo：2 实现
+  void zipFiles() {
+    var encoder = ZipFileEncoder();
+    encoder.zipDirectory(
+        Directory('D:\\Users\\Administrator\\Downloads\\23-07-28_15-02-00 (1)'),
+        filename: './out.zip');
+    String zipFilePath = encoder.zipPath;
+    encoder.close();
+  }
+
+  static zipFileCreate(SendPort sendPort) async {
+    // 创建监听port，并把sendPort 传给外界调用
+    ReceivePort receivePort = ReceivePort();
+    sendPort.send(receivePort.sendPort);
+
+    //监听
+  }
 }
