@@ -7,7 +7,10 @@ import 'dart:isolate';
 import 'package:archive/archive.dart';
 import 'package:archive/archive_io.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_demo/route/file_operation_route.dart';
+import 'package:flutter_demo/route/http_test_route.dart';
 import 'package:flutter_demo/widgets/ConfigJsonReadWidget.dart';
+import 'package:flutter_demo/widgets/setting_page.dart';
 import 'package:path/path.dart' as path;
 
 void main() {
@@ -25,7 +28,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const HttpTestRoute(),
+      // home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
@@ -106,21 +110,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       ),
     );
     // 第三页
-    Widget thirdPageWidget = Container(
-      child: Card(
-        margin: const EdgeInsets.all(12.0),
-        elevation: 0,
-        color: Theme.of(context).colorScheme.surfaceVariant,
-        child: Padding(
-          padding: EdgeInsets.all(12.0),
-          child: ListView(
-            children: [
-              const Text("第3页"),
-            ],
-          ),
-        ),
-      ),
-    );
+    Widget thirdPageWidget = SettingPage();
     // 添加可被底部导航栏进行切换的Widget 页面
     List<Widget> pages = [homePageWidget, secondPageWidget, thirdPageWidget];
 
