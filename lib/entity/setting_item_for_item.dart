@@ -7,14 +7,18 @@ class SettingItemForItem implements SettingItem {
   final String itemSubtitle;
   final Widget actionFormWidget;
 
-  SettingItemForItem(
-      this.settingItemName, this.itemSubtitle, this.actionFormWidget);
+  /// 构建点击该项目时要执行的操作
+  @override
+  var executeOnPressed;
+
+  SettingItemForItem(this.settingItemName, this.itemSubtitle,
+      this.actionFormWidget, this.executeOnPressed);
 
   @override
   Widget buildTile(BuildContext buildContext) {
     return Text(
       settingItemName,
-      style: Theme.of(buildContext).textTheme.labelSmall,
+      style: Theme.of(buildContext).textTheme.titleMedium,
     );
   }
 
@@ -23,7 +27,7 @@ class SettingItemForItem implements SettingItem {
   Widget buildSubTitle(BuildContext buildContext) {
     return Text(
       itemSubtitle,
-      style: Theme.of(buildContext).textTheme.displaySmall,
+      style: Theme.of(buildContext).textTheme.labelSmall,
     );
   }
 

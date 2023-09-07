@@ -5,7 +5,11 @@ import 'package:flutter_demo/entity/setting_item.dart';
 class SettingItemForHeader implements SettingItem {
   final String headerString;
 
-  SettingItemForHeader(this.headerString);
+  /// 构建点击该项目时要执行的操作
+  @override
+  var executeOnPressed;
+
+  SettingItemForHeader(this.headerString, this.executeOnPressed);
 
   @override
   Widget buildTile(BuildContext buildContext) {

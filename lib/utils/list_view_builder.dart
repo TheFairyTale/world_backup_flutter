@@ -15,8 +15,8 @@ class ListViewBuilder {
         return ListTile(
           title: item.buildTile(context),
           subtitle: item.buildSubTitle(context),
-          // trailing: item.buildFormSelectWidget(context),
-          onTap: () {},
+          trailing: item.buildFormSelectWidget(context),
+          onTap: item.executeOnPressed,
         );
       },
     );
