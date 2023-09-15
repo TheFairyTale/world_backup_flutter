@@ -32,7 +32,30 @@ class _BackupDateTimeSettingRouteState
                   color: Theme.of(context).colorScheme.surfaceVariant,
                   child: Padding(
                     padding: EdgeInsets.all(12.0),
-                    child: Text("$args"),
+                    child: ElevatedButton(
+                      child: Text("$args"),
+                      onPressed: () {
+                        DatePicker.showDatePicker(context,
+                            showTitleActions: true,
+                            // minTime: DateTime(2018, 3, 5),
+                            // maxTime: DateTime(2019, 6, 7),
+                            theme: DatePickerTheme(
+                                headerColor: Colors.grey,
+                                backgroundColor: Colors.green,
+                                itemStyle: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18),
+                                doneStyle: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16)), onChanged: (date) {
+                          print('change $date in time zone ' +
+                              date.timeZoneOffset.inHours.toString());
+                        }, onConfirm: (date) {
+                          print('confirm $date');
+                        }, currentTime: DateTime.now(), locale: LocaleType.en);
+                      },
+                    ),
                   ))),
         ));
   }
