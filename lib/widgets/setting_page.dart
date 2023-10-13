@@ -3,6 +3,7 @@ import 'package:flutter_demo/entity/setting_item.dart';
 import 'package:flutter_demo/entity/setting_item_for_header.dart';
 import 'package:flutter_demo/entity/setting_item_for_item.dart';
 import 'package:flutter_demo/utils/list_view_builder.dart';
+import 'package:date_time_picker/date_time_picker.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
@@ -47,9 +48,25 @@ class _SettingPageState extends State<SettingPage> {
           ),
           () {}),
       SettingItemForItem("定时备份时间", "选择一个时间，当处于该时间时则备份程序将自动执行相应的备份操作",
-          Text("在 $dateTime \n 将进行一次备份"), () {
-        Navigator.of(context)
-            .pushNamed("backup_datetime_picker", arguments: dateTime);
+          Text('2023-10-12 00:00:00'),
+          // , () {
+          //   Navigator.of(context)
+          //       .pushNamed("backup_datetime_picker", arguments: dateTime);
+          // }
+          () {
+        DateTimePicker(
+          type: DateTimePickerType.dateTimeSeparate,
+          initialValue: DateTime.now().toString(),
+          firstDate: DateTime(2000),
+          lastDate: DateTime(2410),
+          dateLabelText: 'Date',
+          onChanged: (val) => print(val),
+          validator: (val) {
+            print(val);
+            return null;
+          },
+          onSaved: (val) => print(val),
+        );
       })
     ];
   }

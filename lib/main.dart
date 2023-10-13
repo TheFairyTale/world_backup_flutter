@@ -7,7 +7,6 @@ import 'dart:isolate';
 import 'package:archive/archive.dart';
 import 'package:archive/archive_io.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_demo/route/backup_datetime_setting_route.dart';
 import 'package:flutter_demo/route/file_operation_route.dart';
 import 'package:flutter_demo/route/http_test_route.dart';
 import 'package:flutter_demo/widgets/ConfigJsonReadWidget.dart';
@@ -30,7 +29,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       routes: {
-        "backup_datetime_picker": (context) => BackupDateTimeSettingRoute()
+        // "backup_datetime_picker": (context) => BackupDateTimeSettingRoute()
       },
       // home: const HttpTestRoute(),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
