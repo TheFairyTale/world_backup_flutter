@@ -6,12 +6,14 @@ import 'dart:isolate';
 
 import 'package:archive/archive.dart';
 import 'package:archive/archive_io.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_demo/route/file_operation_route.dart';
 import 'package:flutter_demo/route/http_test_route.dart';
 import 'package:flutter_demo/widgets/ConfigJsonReadWidget.dart';
 import 'package:flutter_demo/widgets/setting_page.dart';
 import 'package:path/path.dart' as path;
+import 'package:uuid/uuid.dart';
 
 void main() {
   runApp(const MyApp());
@@ -47,7 +49,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
-  int currentPageIndex = 1;
+  int currentPageIndex = 0;
   int _counter = 0;
   var streamController;
   // 获取StreamSink用于发射事件
@@ -268,17 +270,55 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     return dirObj.exists();
   }
 
-  void zipEncoder() async {
+  /// 根据指定的备份文件夹及希望生成的zip 文件路径与名称获取需压缩文件及目标文件
+  void zipEncoder(String backupFolder, String targetZipFilePathToName) async {
     var zipFileEncoder = ZipFileEncoder();
-    String dirPathString =
-        "D:\\Users\\Administrator\\Downloads\\TheMinecraft\\.minecraft\\saves\\新的世界，崭新的生活！";
+    String dirPathString = backupFolder;
     if (!dirPathString.endsWith("\\")) {
       dirPathString += "\\";
     }
+    // else if (!targetZipFilePathToName.endsWith("\\")) {
+    //   targetZipFilePathToName += "\\";
+    // }
+
     print("Path -> " + dirPathString);
-    zipFileEncoder.zipDirectory(Directory(dirPathString),
-        level: Deflate.BEST_COMPRESSION,
-        filename: 'D:\\Users\\Administrator\\Downloads\\out.zip');
+    try {
+      List<String> uuidArray = Uuid().v1().split('-');
+      zipFileEncoder.zipDirectory(Directory(dirPathString),
+          level: Deflate.BEST_COMPRESSION,
+          filename: targetZipFilePathToName +
+              "\\" +
+              (DateTime.now().toString().split('.')[0])
+                  .replaceAll(' ', '_')
+                  .replaceAll(':', '-') +
+              "_" +
+              uuidArray[uuidArray.length - 1] +
+              ".zip");
+    } catch (exception, stack) {
+      print("无法执行压缩任务: $exception");
+      // throw PathAccessException("$exception", osError)
+    }
+  }
+
+  /// 无限进度指示器
+  Widget returnNonLimitedProgressIndicator() {
+    return LinearProgressIndicator(
+      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      color: Theme.of(context).colorScheme.primary,
+      // color: Theme.of(context).colorScheme.inverseSurface,
+      semanticsLabel: '',
+    );
+  }
+
+  /// 无进度的线性进度指示器
+  Widget returnProgressedIndicator(double value) {
+    return LinearProgressIndicator(
+      value: value,
+      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      color: Theme.of(context).colorScheme.primary,
+      // color: Theme.of(context).colorScheme.inverseSurface,
+      semanticsLabel: '',
+    );
   }
 
   /// Column里面嵌套Column、ListView、EasyRefresh等空间具有无限延展性等控件，
@@ -287,6 +327,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   /// 只要每层可无限延展的控件外面都套上Expanded，允许他们最大值延展，那就没问题。
 
   List<Widget> homePageWidgets() {
+    final String defaultText = "无正在进行的任务";
+    String displayText = defaultText;
+    Widget widgetOfProgress = returnProgressedIndicator(0.0);
+
     return <Widget>[
       Card(
         margin: const EdgeInsets.all(12.0),
@@ -302,8 +346,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 Padding(
                   padding: EdgeInsets.only(bottom: 6.0),
                   child: SizedBox(
-                    child: const Text(
-                      "当前正在进行的任务:",
+                    child: Text(
+                      displayText,
                       textAlign: TextAlign.start,
                     ),
                   ),
@@ -313,17 +357,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   child: SizedBox(
                     child: Row(
                       // alignment: Alignment.center,
-                      children: [
-                        Expanded(
-                            child: LinearProgressIndicator(
-                          value: 0.2,
-                          backgroundColor:
-                              Theme.of(context).colorScheme.inversePrimary,
-                          color: Theme.of(context).colorScheme.primary,
-                          // color: Theme.of(context).colorScheme.inverseSurface,
-                          semanticsLabel: '压缩: temp.zip 文件',
-                        ))
-                      ],
+                      children: [Expanded(child: widgetOfProgress)],
                     ),
                   ),
                 ),
@@ -366,9 +400,39 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                     child: Row(
                       children: [
                         OutlinedButton.icon(
-                            onPressed: () {},
+                            onPressed: () async {
+                              String? selectedDir =
+                                  await FilePicker.platform.getDirectoryPath();
+                              String? outputDir =
+                                  await FilePicker.platform.getDirectoryPath();
+                              if (selectedDir == null || outputDir == null) {
+                                return;
+                              }
+
+                              try {
+                                setState(() {
+                                  displayText = "正在压缩:";
+                                  widgetOfProgress =
+                                      returnNonLimitedProgressIndicator();
+                                });
+
+                                /// TODO 2023-11-01 会卡住主线程。
+                                zipEncoder(selectedDir, outputDir);
+                              }
+                              // on PathAccessException
+                              catch (exception, stack) {
+                                widgetOfProgress =
+                                    returnProgressedIndicator(0.0);
+                                displayText =
+                                    "压缩时出现问题, $exception。\n压缩任务未能成功完成。";
+                              }
+                              widgetOfProgress =
+                                  returnProgressedIndicator(100.0);
+                              displayText = defaultText;
+                              print("completed.");
+                            },
                             icon: const Icon(Icons.folder_zip_outlined),
-                            label: Text("开始备份文件"))
+                            label: Text("选择一个文件夹以开始备份文件"))
                       ],
                     ),
                   ),
