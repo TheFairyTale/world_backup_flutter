@@ -270,6 +270,27 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     return dirObj.exists();
   }
 
+/// isolate 测试方法
+  isolateTest(String backupFolder, String targetZipFilePathToName) async {
+    final receivePort = ReceivePort();
+    await Isolate.spawn(zipEncoderByIsolate, receivePort.sendPort);
+    final sendPort = await receivePort.first;
+    final answer = ReceivePort();
+    sendPort.send([answer.sendPort, '缺省参数']);
+    // answer.first;
+    if (receivePort != null ) {
+      receivePort.close();
+    }
+if(answer != null) {
+  answer.close();
+}
+  }
+
+  ///isolate 包装后的zip压缩方法
+  void zipEncoderByIsolate(SendPort sendPort) {
+    zipEncoder(backupFolder, targetZipFilePathToName)
+  }
+
   /// 根据指定的备份文件夹及希望生成的zip 文件路径与名称获取需压缩文件及目标文件
   void zipEncoder(String backupFolder, String targetZipFilePathToName) async {
     var zipFileEncoder = ZipFileEncoder();
