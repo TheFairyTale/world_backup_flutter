@@ -7,6 +7,7 @@ import 'dart:isolate';
 import 'package:archive/archive.dart';
 import 'package:archive/archive_io.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_demo/route/file_operation_route.dart';
 import 'package:flutter_demo/route/http_test_route.dart';
@@ -270,56 +271,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     return dirObj.exists();
   }
 
-/// isolate 测试方法
-  isolateTest(String backupFolder, String targetZipFilePathToName) async {
-    final receivePort = ReceivePort();
-    await Isolate.spawn(zipEncoderByIsolate, receivePort.sendPort);
-    final sendPort = await receivePort.first;
-    final answer = ReceivePort();
-    sendPort.send([answer.sendPort, '缺省参数']);
-    // answer.first;
-    if (receivePort != null ) {
-      receivePort.close();
-    }
-if(answer != null) {
-  answer.close();
-}
-  }
-
-  ///isolate 包装后的zip压缩方法
-  void zipEncoderByIsolate(SendPort sendPort) {
-    zipEncoder(backupFolder, targetZipFilePathToName)
-  }
+  /// isolate 测试方法
 
   /// 根据指定的备份文件夹及希望生成的zip 文件路径与名称获取需压缩文件及目标文件
-  void zipEncoder(String backupFolder, String targetZipFilePathToName) async {
-    var zipFileEncoder = ZipFileEncoder();
-    String dirPathString = backupFolder;
-    if (!dirPathString.endsWith("\\")) {
-      dirPathString += "\\";
-    }
-    // else if (!targetZipFilePathToName.endsWith("\\")) {
-    //   targetZipFilePathToName += "\\";
-    // }
-
-    print("Path -> " + dirPathString);
-    try {
-      List<String> uuidArray = Uuid().v1().split('-');
-      zipFileEncoder.zipDirectory(Directory(dirPathString),
-          level: Deflate.BEST_COMPRESSION,
-          filename: targetZipFilePathToName +
-              "\\" +
-              (DateTime.now().toString().split('.')[0])
-                  .replaceAll(' ', '_')
-                  .replaceAll(':', '-') +
-              "_" +
-              uuidArray[uuidArray.length - 1] +
-              ".zip");
-    } catch (exception, stack) {
-      print("无法执行压缩任务: $exception");
-      // throw PathAccessException("$exception", osError)
-    }
-  }
+  // FutureOr<String> zipEncoder(
+  //     String backupFolder, String targetZipFilePathToName) async {
+  // }
 
   /// 无限进度指示器
   Widget returnNonLimitedProgressIndicator() {
@@ -437,8 +394,76 @@ if(answer != null) {
                                       returnNonLimitedProgressIndicator();
                                 });
 
+                                print(displayText);
+                                final resultPort = ReceivePort();
+
+                                print('准备执行隔离代码...');
+                                String content = await compute(
+                                    zipFileEncodeForIsolate,
+                                    [selectedDir, outputDir]);
+
+                                // await Isolate.spawn(zipFileEncodeForIsolate, [
+                                //   resultPort.sendPort,
+                                //   selectedDir,
+                                //   outputDir
+                                // ]);
+                                // String resultMsg =
+                                //     await resultPort.first as String;
+                                // print('已完成或已提交.' + resultMsg);
+                                print('已完成或已提交.' + content);
+
                                 /// TODO 2023-11-01 会卡住主线程。
-                                zipEncoder(selectedDir, outputDir);
+                                // await Isolate.run(() async {
+                                //   print('sleep!');
+                                //   sleep(Duration(seconds: 30));
+                                //   print('walk!');
+                                // var zipFileEncoder = ZipFileEncoder();
+                                // String dirPathString = selectedDir;
+                                // List<String> uuidArray =
+                                //     Uuid().v1().split('-');
+                                // zipFileEncoder.zipDirectory(
+                                //     Directory(dirPathString),
+                                //     level: Deflate.BEST_COMPRESSION,
+                                //     filename: outputDir +
+                                //         "\\" +
+                                //         (DateTime.now()
+                                //                 .toString()
+                                //                 .split('.')[0])
+                                //             .replaceAll(' ', '_')
+                                //             .replaceAll(':', '-') +
+                                //         "_" +
+                                //         uuidArray[uuidArray.length - 1] +
+                                //         ".zip");
+                                // if (!dirPathString.endsWith("\\")) {
+                                //   dirPathString += "\\";
+                                // }
+                                // // else if (!targetZipFilePathToName.endsWith("\\")) {
+                                // //   targetZipFilePathToName += "\\";
+                                // // }
+
+                                // print("Path -> " + dirPathString);
+                                // try {
+                                //   List<String> uuidArray =
+                                //       Uuid().v1().split('-');
+                                //   zipFileEncoder.zipDirectory(
+                                //       Directory(dirPathString),
+                                //       level: Deflate.BEST_COMPRESSION,
+                                //       filename: outputDir +
+                                //           "\\" +
+                                //           (DateTime.now()
+                                //                   .toString()
+                                //                   .split('.')[0])
+                                //               .replaceAll(' ', '_')
+                                //               .replaceAll(':', '-') +
+                                //           "_" +
+                                //           uuidArray[uuidArray.length - 1] +
+                                //           ".zip");
+                                // } catch (exception, stack) {
+                                //   print("无法执行压缩任务: $exception");
+                                //   // throw PathAccessException("$exception", osError)
+                                // }
+                                //   print('压缩已经成功完成。');
+                                // });
                               }
                               // on PathAccessException
                               catch (exception, stack) {
@@ -473,6 +498,58 @@ if(answer != null) {
   //   json
   //   return map;
   // }
+
+  static FutureOr<String> zipFileEncodeForIsolate(List<String> args) async {
+    print('正在调用zipFileEncodeForIsolate() ...');
+    // SendPort sendPort = args[0];
+    print('入参: ' + args.toString());
+    String selectedDir = args[0];
+    String outputDir = args[1];
+    print('获取到值：' + selectedDir + ", " + outputDir);
+
+    try {
+      print('sleeping...');
+      sleep(Duration(seconds: 10));
+      var zipFileEncoder = ZipFileEncoder();
+      String dirPathString = selectedDir;
+      // List<String> uuidArray = Uuid().v1().split('-');
+      // zipFileEncoder.zipDirectory(Directory(dirPathString),
+      //     level: Deflate.BEST_COMPRESSION,
+      //     filename: outputDir +
+      //         "\\" +
+      //         (DateTime.now().toString().split('.')[0])
+      //             .replaceAll(' ', '_')
+      //             .replaceAll(':', '-') +
+      //         "_" +
+      //         uuidArray[uuidArray.length - 1] +
+      //         ".zip");
+      if (!dirPathString.endsWith("\\")) {
+        dirPathString += "\\";
+      }
+      // else if (!targetZipFilePathToName.endsWith("\\")) {
+      //   targetZipFilePathToName += "\\";
+      // }
+
+      print("Path -> " + dirPathString);
+      List<String> uuidArray = Uuid().v1().split('-');
+      zipFileEncoder.zipDirectory(Directory(dirPathString),
+          level: Deflate.BEST_COMPRESSION,
+          filename: outputDir +
+              "\\" +
+              (DateTime.now().toString().split('.')[0])
+                  .replaceAll(' ', '_')
+                  .replaceAll(':', '-') +
+              "_" +
+              uuidArray[uuidArray.length - 1] +
+              ".zip");
+    } catch (exception, stack) {
+      print("无法执行压缩任务: $exception");
+      // throw PathAccessException("$exception", osError)
+    }
+    print('压缩已经成功完成。');
+    // Isolate.exit(sendPort, '压缩已经成功完成。');
+    return '压缩已经成功完成。';
+  }
 
   /// 压缩指定目录下的文件
   /// todo: 1 先实现扫描指定目录下所有文件所占总和空间

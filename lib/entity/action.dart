@@ -1,4 +1,3 @@
-class Action
- {
-  o;
+class Action {
+  // o;
 }
