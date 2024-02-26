@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_demo/entity/setting_item.dart';
+import 'package:flutter_demo/models/setting_item.dart';
 
 /// 设置页下的其中的某一个标题
 class SettingItemForHeader implements SettingItem {

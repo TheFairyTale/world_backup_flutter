@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_demo/entity/setting_item.dart';
+import 'package:flutter_demo/models/setting_item.dart';
 
 class ListViewBuilder {
   /// 获取专为设置界面配置的ListView ，用于生成设置界面的基础列表外观样式

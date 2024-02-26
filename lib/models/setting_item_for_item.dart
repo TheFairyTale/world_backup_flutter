@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_demo/entity/setting_item.dart';
+import 'package:flutter_demo/models/setting_item.dart';
 
 /// 设置页下统一的项目item
 class SettingItemForItem implements SettingItem {
