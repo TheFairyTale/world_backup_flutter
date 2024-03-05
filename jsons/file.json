@@ -1,0 +1,8 @@
+{
+    "name": "1.zip",
+    "suffix": "前缀",
+    "abstractPath?" : "绝对路径",
+    "size" : 0,
+    "createAt" : "创建时间",
+    "modifiedAt" : "修改时间"
+}
