@@ -2,33 +2,30 @@ import 'package:flutter_demo/generated/json/base/json_convert_content.dart';
 import 'package:flutter_demo/models/file_entity.dart';
 
 FileEntity $FileEntityFromJson(Map<String, dynamic> json) {
+  final FileEntity fileEntity = FileEntity();
   final String? name = jsonConvert.convert<String>(json['name']);
-  final String? suffix = jsonConvert.convert<String>(json['suffix']);
-  final String? abstractpath =
-      jsonConvert.convert<String>(json['abstractPath?']);
-  final int? size = jsonConvert.convert<int>(json['size']);
-  final String? createAt = jsonConvert.convert<String>(json['createAt']);
-  final String? modifiedAt = jsonConvert.convert<String>(json['modifiedAt']);
-
-  final FileEntity fileEntity = FileEntity(
-      name: name!,
-      suffix: suffix!,
-      abstractpath: abstractpath!,
-      size: size!,
-      createAt: createAt!,
-      modifiedAt: modifiedAt);
-
-  if ((name != null) &&
-      (suffix != null) &&
-      (abstractpath != null) &&
-      (size != null) &&
-      (createAt != null) &&
-      (modifiedAt != null)) {
+  if (name != null) {
     fileEntity.name = name;
+  }
+  final String? suffix = jsonConvert.convert<String>(json['suffix']);
+  if (suffix != null) {
     fileEntity.suffix = suffix;
+  }
+  final String? abstractpath = jsonConvert.convert<String>(
+      json['abstractPath?']);
+  if (abstractpath != null) {
     fileEntity.abstractpath = abstractpath;
+  }
+  final int? size = jsonConvert.convert<int>(json['size']);
+  if (size != null) {
     fileEntity.size = size;
+  }
+  final String? createAt = jsonConvert.convert<String>(json['createAt']);
+  if (createAt != null) {
     fileEntity.createAt = createAt;
+  }
+  final String? modifiedAt = jsonConvert.convert<String>(json['modifiedAt']);
+  if (modifiedAt != null) {
     fileEntity.modifiedAt = modifiedAt;
   }
   return fileEntity;
@@ -54,13 +51,7 @@ extension FileEntityExtension on FileEntity {
     String? createAt,
     String? modifiedAt,
   }) {
-    return FileEntity(
-        name: name!,
-        suffix: suffix!,
-        abstractpath: abstractpath!,
-        size: size!,
-        createAt: createAt!,
-        modifiedAt: modifiedAt)
+    return FileEntity()
       ..name = name ?? this.name
       ..suffix = suffix ?? this.suffix
       ..abstractpath = abstractpath ?? this.abstractpath

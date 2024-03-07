@@ -17,6 +17,14 @@ packages:
       url: "https://pub-web.flutter-io.cn"
     source: hosted
     version: "5.13.0"
+  animate_do:
+    dependency: "direct main"
+    description:
+      name: animate_do
+      sha256: "7a3162729f0ea042f9dd84da217c5bde5472ad9cef644079929d4304a5dc4ca0"
+      url: "https://pub-web.flutter-io.cn"
+    source: hosted
+    version: "3.3.4"
   archive:
     dependency: "direct main"
     description:
@@ -185,6 +193,14 @@ packages:
       url: "https://pub-web.flutter-io.cn"
     source: hosted
     version: "1.18.0"
+  common_utils:
+    dependency: transitive
+    description:
+      name: common_utils
+      sha256: c26884339b13ff99b0739e56f4b02090c84054ed9dd3a045435cd24e7b99c2c1
+      url: "https://pub-web.flutter-io.cn"
+    source: hosted
+    version: "2.1.0"
   console:
     dependency: transitive
     description:
@@ -225,6 +241,14 @@ packages:
       url: "https://pub-web.flutter-io.cn"
     source: hosted
     version: "2.3.2"
+  decimal:
+    dependency: transitive
+    description:
+      name: decimal
+      sha256: "24a261d5d5c87e86c7651c417a5dbdf8bcd7080dd592533910e8d0505a279f21"
+      url: "https://pub-web.flutter-io.cn"
+    source: hosted
+    version: "2.3.3"
   dio:
     dependency: "direct main"
     description:
@@ -273,6 +297,14 @@ packages:
       url: "https://pub-web.flutter-io.cn"
     source: hosted
     version: "1.1.0"
+  flustars_flutter3:
+    dependency: "direct main"
+    description:
+      name: flustars_flutter3
+      sha256: d4f412eeb97e648dfe5cf888aa9066f6c1b1f133ff72dca264c0d23a906e3dab
+      url: "https://pub-web.flutter-io.cn"
+    source: hosted
+    version: "3.0.0"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -677,6 +709,14 @@ packages:
       url: "https://pub-web.flutter-io.cn"
     source: hosted
     version: "1.2.3"
+  rational:
+    dependency: transitive
+    description:
+      name: rational
+      sha256: ba58e9e18df9abde280e8b10051e4bce85091e41e8e7e411b6cde2e738d357cf
+      url: "https://pub-web.flutter-io.cn"
+    source: hosted
+    version: "2.2.2"
   rxdart:
     dependency: transitive
     description:
@@ -786,6 +826,14 @@ packages:
       url: "https://pub-web.flutter-io.cn"
     source: hosted
     version: "1.10.0"
+  sp_util:
+    dependency: transitive
+    description:
+      name: sp_util
+      sha256: "9da43dce5de79c17a787d0626bf01538d63090ca32521200d22a232171c495dc"
+      url: "https://pub-web.flutter-io.cn"
+    source: hosted
+    version: "2.0.3"
   sprintf:
     dependency: transitive
     description:
