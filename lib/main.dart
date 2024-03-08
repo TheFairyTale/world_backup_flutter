@@ -125,14 +125,25 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       List<FileEntity> items = <FileEntity>[];
       for (var element in fileSystemEntitiesList) {
         String path = element.path;
+        // 获取文件后缀
         int lastIndexOfSuffix = path.lastIndexOf('.');
         if (lastIndexOfSuffix == -1) {
-          continue;
+          lastIndexOfSuffix = path.length;
         }
-        String fileName = path.substring(0, lastIndexOfSuffix);
-        String suffixString = path.substring(lastIndexOfSuffix, path.length);
+        // 获取文件名（去除后缀）
+        int lastIndexOfFileName = path.lastIndexOf('\\');
+        if (lastIndexOfFileName == -1) {
+          lastIndexOfFileName = 0;
+        }
+
+        String fileName = path.substring(lastIndexOfFileName + 1, path.length);
+        String suffixString = (lastIndexOfSuffix == path.length)
+            ? ""
+            : path.substring(lastIndexOfSuffix + 1, path.length);
         // 为文件时返回文件大小，否则返回0
-        var fileLength = (element.statSync().type == FileSystemEntityType.file) ? File(path).lengthSync() : 0;
+        var fileLength = (element.statSync().type == FileSystemEntityType.file)
+            ? File(path).lengthSync()
+            : 0;
         DateTime modifiedTime = FileStat.statSync(path).modified;
         StringBuffer sb = StringBuffer();
         sb.write(modifiedTime.year);
