@@ -16,22 +16,26 @@ class _SettingPageState extends State<SettingPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: MediaQuery.of(context).size.height,
-      width: MediaQuery.of(context).size.width,
-      child: Expanded(
-        child: Card(
-          margin: const EdgeInsets.all(12.0),
-          elevation: 0,
-          color: Theme.of(context).colorScheme.surfaceVariant,
-          child: Padding(
-            padding: EdgeInsets.all(12.0),
-            child:
-                ListViewBuilder().getListViewWidget(buildPageItemList(context)),
-          ),
+    return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         ),
-      ),
-    );
+        body: Container(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          child: Expanded(
+            child: Card(
+              margin: const EdgeInsets.all(12.0),
+              elevation: 0,
+              color: Theme.of(context).colorScheme.surfaceVariant,
+              child: Padding(
+                padding: EdgeInsets.all(12.0),
+                child: ListViewBuilder()
+                    .getListViewWidget(buildPageItemList(context)),
+              ),
+            ),
+          ),
+        ));
   }
 
   List<SettingItem> buildPageItemList(BuildContext context) {

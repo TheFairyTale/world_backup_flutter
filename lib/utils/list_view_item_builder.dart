@@ -34,12 +34,13 @@ class ListViewItemBuilder extends ListViewBuilder {
         padding: const EdgeInsets.all(10.0),
         child: DecoratedBox(
             decoration: BoxDecoration(
-                color: Colors.orange,
+                // color: Colors.orange,
                 border: Border(
-                    top: BorderSide(width: 1.0),
-                    bottom: BorderSide(width: 1.0),
-                    left: BorderSide(width: 1.0),
-                    right: BorderSide(width: 1.0))),
+                    // top: BorderSide(width: 1.0),
+                    // bottom: BorderSide(width: 1.0),
+                    // left: BorderSide(width: 1.0),
+                    // right: BorderSide(width: 1.0)
+                    )),
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 mainAxisSize: MainAxisSize.max,
@@ -55,9 +56,12 @@ class ListViewItemBuilder extends ListViewBuilder {
                             )),
                     child: Column(
                       children: [
-                        CircleAvatar(
-                          child: Icon(icons),
-                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 10),
+                          child: CircleAvatar(
+                            child: Icon(icons),
+                          ),
+                        )
                       ],
                     ),
                   ),
@@ -71,28 +75,37 @@ class ListViewItemBuilder extends ListViewBuilder {
                         // 左列（包含主标题、所在路径等）
                         DecoratedBox(
                             decoration: BoxDecoration(
-                                color: Colors.lightGreen,
+                                // color: Colors.lightGreen,
                                 border: Border(
-                                    top: BorderSide(width: 1.0),
-                                    bottom: BorderSide(width: 1.0),
-                                    left: BorderSide(width: 1.0),
-                                    right: BorderSide(width: 1.0))),
+                                    // top: BorderSide(width: 1.0),
+                                    // bottom: BorderSide(width: 1.0),
+                                    // left: BorderSide(width: 1.0),
+                                    // right: BorderSide(width: 1.0)
+                                    )),
                             child: Column(
+                                // 使列组件的上下排列顺序为靠上，从上到下排
                                 mainAxisAlignment: MainAxisAlignment.start,
+                                // 使列组件的横向对其方式为：靠左对其
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [Text(title), Text(absolutePath)])),
                         // 空位置填空
                         // Expanded(child: SizedBox()),
                         // Expanded(child: Spacer()),
                         DecoratedBox(
                             decoration: BoxDecoration(
-                                color: Colors.purple,
+                                // color: Colors.purple,
                                 border: Border(
-                                    top: BorderSide(width: 1.0),
-                                    bottom: BorderSide(width: 1.0),
-                                    left: BorderSide(width: 1.0),
-                                    right: BorderSide(width: 1.0))),
+                                    // top: BorderSide(width: 1.0),
+                                    // bottom: BorderSide(width: 1.0),
+                                    // left: BorderSide(width: 1.0),
+                                    // right: BorderSide(width: 1.0)
+                                    )),
                             child: Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
+
+                                // 使列组件的上下排列顺序为靠上，从上到下排
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                // 使列组件的横向对其方式为：靠右对其
+                                crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
