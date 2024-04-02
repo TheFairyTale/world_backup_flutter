@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_demo/models/file_entity.dart';
 import 'package:flutter_demo/route/file_operation_route.dart';
 import 'package:flutter_demo/route/http_test_route.dart';
+import 'package:flutter_demo/service/timer_clock_isolate.dart';
 import 'package:flutter_demo/utils/file_operator_util.dart';
 import 'package:flutter_demo/utils/list_view_item_builder.dart';
 import 'package:flutter_demo/widgets/ConfigJsonReadWidget.dart';
@@ -71,6 +72,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    TimerClockIsolate.createTimerBackupIsolateMainThread("hello")
+        .then((value) => print(value))
+        .whenComplete(() => print("创建完毕子线程"));
+
+
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -79,6 +86,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           IconButton(
             icon: Icon(Icons.settings),
             onPressed: () {
+              TimerClockIsolate.createTimerBackupIsolateMainThread("stop")
+                  .then((value) => print(value))
+                  .whenComplete(() => print("已关闭子线程"));
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => SettingPage()),
