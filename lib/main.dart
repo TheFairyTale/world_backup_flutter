@@ -26,6 +26,8 @@ import 'package:uuid/uuid.dart';
 void main() {
   // 启用log，否则调用其他log 语句不会生效
   LogUtil.init(tag: "Main", isDebug: true, maxLen: 999999);
+  // 启用子线程（初始化）
+  TimerClockIsolate();
   runApp(const MyApp());
 }
 
@@ -72,9 +74,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    TimerClockIsolate.createTimerBackupIsolateMainThread("hello")
-        .then((value) => print(value))
-        .whenComplete(() => print("创建完毕子线程"));
+    TimerClockIsolate.getTimerBackupIsolateMainThread("hello")
+        .then((value) => print(value));
 
 
 
@@ -86,9 +87,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           IconButton(
             icon: Icon(Icons.settings),
             onPressed: () {
-              TimerClockIsolate.createTimerBackupIsolateMainThread("stop")
-                  .then((value) => print(value))
-                  .whenComplete(() => print("已关闭子线程"));
+              TimerClockIsolate.getTimerBackupIsolateMainThread("stop")
+                  .then((value) => print(value));
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => SettingPage()),
