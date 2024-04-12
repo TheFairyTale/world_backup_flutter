@@ -54,6 +54,9 @@ dependencies:
   cupertino_icons: ^1.0.2
   animate_do: ^3.3.4
   flustars_flutter3: ^3.0.0
+  async_zip: ^0.1.0
+  oauth2: ^2.0.2
+  url_launcher: ^6.2.5
 
 dev_dependencies:
   flutter_test:

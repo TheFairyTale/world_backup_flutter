@@ -1,27 +1,16 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:ffi';
 import 'dart:io';
-import 'dart:isolate';
 
 import 'package:animate_do/animate_do.dart';
-import 'package:archive/archive.dart';
-import 'package:archive/archive_io.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flustars_flutter3/flustars_flutter3.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_demo/models/file_entity.dart';
-import 'package:flutter_demo/route/file_operation_route.dart';
-import 'package:flutter_demo/route/http_test_route.dart';
 import 'package:flutter_demo/service/timer_clock_isolate.dart';
 import 'package:flutter_demo/utils/file_operator_util.dart';
 import 'package:flutter_demo/utils/list_view_item_builder.dart';
-import 'package:flutter_demo/widgets/ConfigJsonReadWidget.dart';
 import 'package:flutter_demo/widgets/setting_page.dart';
-import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() {
   // 启用log，否则调用其他log 语句不会生效
@@ -61,6 +50,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
+  // todo 改为从配置文件中读取常量
+  String _API_ADDRESS = "https://openapi.alipan.com";
+  String _SCHEME = "https";
+  String _HOST = "openapi.alipan.com";
+  String _CLIENT_ID = "";
+  String _REDIRECT_URI = "http://127.0.0.1";
+  String _SCOPE = "user:base";
+
   // todo 某些内容不应放在init 生命周期内
   @override
   void initState() {
@@ -74,10 +71,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    Future<void>? _launched;
+
     TimerClockIsolate.getTimerBackupIsolateMainThread("hello")
         .then((value) => print(value));
-
-
 
     return Scaffold(
       appBar: AppBar(
@@ -87,18 +84,51 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           IconButton(
             icon: Icon(Icons.settings),
             onPressed: () {
-              TimerClockIsolate.getTimerBackupIsolateMainThread("stop")
+              // TimerClockIsolate.getTimerBackupIsolateMainThread("stop")
+              //     .then((value) => print(value));
+
+              print("backup waiting.. ");
+              TimerClockIsolate.getTimerBackupIsolateMainThread("backup")
                   .then((value) => print(value));
+              print("backup waiting.. ");
+
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => SettingPage()),
               );
             },
           ),
+          IconButton(
+            icon: Icon(Icons.open_in_new),
+            onPressed: () {
+              setState(() {
+                var uri = Uri(
+                    scheme: _SCHEME,
+                    host: _HOST,
+                    path: "/oauth/authorize" +
+                        "?client_id=" +
+                        _CLIENT_ID +
+                        "&redirect_uri=" +
+                        _REDIRECT_URI +
+                        "&scope=" +
+                        _SCOPE +
+                        "&response_type=code");
+                _launched = _launchInBrowserView(uri);
+              });
+              print("外部浏览器启动结果：" + _launched.toString());
+            },
+          )
         ],
       ),
       body: FadeInDown(child: listWidget),
     );
+  }
+
+  /// 在浏览器中打开指定链接
+  Future<void> _launchInBrowserView(Uri url) async {
+    if (!await launchUrl(url, mode: LaunchMode.inAppBrowserView)) {
+      throw Exception('Could not launch $url');
+    }
   }
 
   Future<String> getBackupFilePath() async {
