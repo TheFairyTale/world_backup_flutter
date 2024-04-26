@@ -57,6 +57,7 @@ dependencies:
   async_zip: ^0.1.0
   oauth2: ^2.0.2
   url_launcher: ^6.2.5
+  rcon: ^1.0.0
 
 dev_dependencies:
   flutter_test:

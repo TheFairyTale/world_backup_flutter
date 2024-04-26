@@ -733,6 +733,14 @@ packages:
       url: "https://pub-web.flutter-io.cn"
     source: hosted
     version: "2.2.2"
+  rcon:
+    dependency: "direct main"
+    description:
+      name: rcon
+      sha256: "4e3f45e9257b2a130b0d9b8345989e13fcd667e1154ee68d47249b4f49d2cbf8"
+      url: "https://pub-web.flutter-io.cn"
+    source: hosted
+    version: "1.0.0"
   rxdart:
     dependency: transitive
     description:
