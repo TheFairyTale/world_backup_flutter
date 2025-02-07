@@ -28,26 +28,43 @@ import '../utils/file_operator_util.dart';
 /// 可以看到实际上主子线程间的通讯方式基本是一致的，可以理解为只是在你创建的子线程方法中需要使用
 /// 入参的SendPort对象调用其send方法将子线程的通讯端口暴露给主线程以供主子双向建立连接
 class TimerClockIsolate {
+  static final Future<SharedPreferences> _prefs =
+      SharedPreferences.getInstance();
+
 // 备份文件夹路径
   static late String? backupPathString;
 
   // 确保这是全局唯一的一个备份线程
   static Isolate? _isolate;
 
-  // 标记备份操作是否正在进行
-  static bool _isZippedOperationStarted = false;
   // 主线程用 ReceivePort
   static late ReceivePort _receivePort;
 
+  static bool _threadCreated = false;
+
+  static int _isolateCreateCount = 0;
+
   static String _mainThreadStaticUuid = Uuid().v1();
 
+  // 表示主线程的receivePort 是否已经被监听
+  static bool _isListened = false;
+
+  // 标记备份操作是否正在进行
+  static bool _isZippedOperationStarted = false;
+
+  // 标记是否要立刻执行备份操作
+  static bool _runBackupNow = false;
+
+  // todo 监听主线程返回的备份时间，并在该时间在本线程执行备份操作，并告知主线程开始备份，结束备份及状态
   TimerClockIsolate() {
     // 如果子线程已经关闭则创建线程
     if (_isolate == null) {
+      _isolateCreateCount++;
       // 1.创建主线程用的ReceivePort
       _receivePort = ReceivePort();
       // static late String _dateTime;
 
+      _threadCreated = true;
       Isolate.spawn(_periodicSubTask, _receivePort.sendPort).then((value) {
         // 2.生成子线程
         _isolate = value;
@@ -71,20 +88,11 @@ class TimerClockIsolate {
     }
   }
 
-  /// 向子线程发布备份指令
-  static void sendBackupCommandToSubtask(String path) {
-    if (_isolate == null) {
-      return;
-    }
-    print('sending...');
-    _receivePort.sendPort.send(path);
-  }
+  // static late ReceivePort receivePort;
 
   /// 子线程函数
   static void _periodicSubTask(SendPort sendPort) {
-    print('main uuid: ' + _mainThreadStaticUuid);
     String uuid = Uuid().v1();
-    print('sub task uuid: ' + uuid);
     // 1.子线程也使用 ReceivePort 接收主线程消息
     ReceivePort receivePort = ReceivePort();
     // 2.发送子线程的SendPort给主线程
@@ -111,21 +119,130 @@ class TimerClockIsolate {
 
     // 3. 监听主线程发来的消息
     receivePort.listen((message) {
-      print(uuid + '_收到消息: ' + message);
-      if (message is String) {
-        _createZipFile(message);
+      print("[" + uuid + "]" + "收到消息：" + message);
+      if (message == "backup") {
+        _runBackupNow = true;
+      }
+    });
+
+    int count = 0;
+    while (true) {
+      if ((count % 2) == 0) {
+        print("[" + uuid + "]" + "count: " + count.toString() + ", sending...");
+        sendPort.send(count);
+      }
+
+      if (_runBackupNow) {
+        backupThreadSendPort?.send('backup');
+      }
+
+      print("[" + uuid + "]" + "当前时间: " + DateTime.now().toString());
+      sleep(Duration(seconds: 5));
+      count++;
+    }
+    // Timer.periodic(Duration(seconds: 5), (Timer timer) {
+    //   DateTime now = DateTime.now();
+    //   print('Background Task Executed at: $now');
+    //
+    //   // 发送消息给主线程
+    //   sendPort.send(now);
+    // });
+  }
+
+  /// zip文件创建并加入数据
+  static void _backupSubTask(SendPort sendPort) {
+    String uuid = Uuid().v1();
+    // 1.子线程也使用 ReceivePort 接收主线程消息
+    ReceivePort receivePort = ReceivePort();
+    // 2.发送子线程的SendPort给主线程
+    sendPort.send(receivePort.sendPort);
+    // if (_runBackupNow) {
+    //   _createZipFile();
+    //   _runBackupNow = false;
+    // }
+    receivePort.listen((message) {
+      print('Zip task: received message: ' + message);
+      if (_runBackupNow) {
+        _createZipFile();
+        _runBackupNow = false;
       }
     });
   }
 
-  static void _createZipFile(String backupPath) async {
-    print('备份正在执行');
+  static void _terminateTimerIsolate() {
+    if (_isolate == null) {
+      return;
+    } else {
+      // 终止Isolate
+      _isolate!.kill(priority: Isolate.immediate);
+    }
+  }
+
+  /// 主线程
+  /// todo bug: 在未主动调用过一次本函数的情况下
+  static Future<String> getTimerBackupIsolateMainThread(String inputMsg) async {
+    String returnMsg = "";
+    if (!_threadCreated) {
+      var err = "未调用TimerClockIsolate() 进行初始化，无法访问线程。";
+      print(err);
+      return err;
+    }
+    // 如果子线程关闭则直接返回空字符串
+    if (_isolate == null) {
+      var err = "子线程未生成或已死亡，需要重新调用TimerClockIsolate() 进行初始化.";
+      print(err);
+      return err;
+    }
+    if (_receivePort == null) {
+      var err = "无法访问子线程通讯端口，请调用TimerClockIsolate() 进行初始化.";
+      print(err);
+      return err;
+    }
+    if (inputMsg == "stop") {
+      _terminateTimerIsolate();
+      return "stoped";
+    }
+    // TimerClockIsolate();
+
+    // 2.生成子线程
+    _isolate = await Isolate.spawn(_periodicSubTask, _receivePort.sendPort);
+    // 3. todo 向子线程通讯
+    // _isolate?.controlPort.send(inputMsg);
+    _receivePort.sendPort.send(inputMsg);
+    // print('sending to subprcess...');
+    // _isolate?.controlPort.send('to _isolate' + inputMsg);
+    // print('sended to subprcess...');
+    // _receivePort.sendPort.send('to _receivePort' + inputMsg);
+
+    // 4.监听子线程消息
+    // todo Bad state: Stream has already been listened to.
+    // todo 判断是否已经监听
+    // var isBroadcast = _receivePort.;
+    try {
+      if (!_isListened) {
+        _receivePort.listen((message) {
+          returnMsg = "[" +
+              _mainThreadStaticUuid +
+              "]" +
+              'Received message from background task: $message';
+          print(returnMsg);
+        });
+        _isListened = true;
+      }
+    } catch (e) {
+      print(e);
+    }
+    return returnMsg;
+  }
+
+  static void _createZipFile() async {
     if (_isZippedOperationStarted) {
       print("已经有备份操作正在执行。");
       return;
     }
 
-    backupPathString = backupPath;
+    final SharedPreferences prefs = await _prefs;
+    backupPathString = prefs.getString('world_path');
     if (backupPathString == null) {
       print('备份路径为空，无法启动备份程序');
       return;
@@ -215,4 +332,9 @@ class TimerClockIsolate {
     // final asyncArchiveSize = asyncArchiveFile.lengthSync();
     // print('Created Zip file at ${asyncArchiveFile.path} with a size of $asyncArchiveSize bytes');
   }
+// static void updateTimerClock(String str) {
+//   DateTime dateTime = DateTimeUtil.parseDateString(inputDateTime: str);
+//   Duration duration = dateTime.difference(DateTime.now());
+//   duration.inSeconds
+// }
 }

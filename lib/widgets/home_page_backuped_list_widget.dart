@@ -8,12 +8,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../models/file_entity.dart';
-import '../service/timer_clock_isolate.dart';
+import '../service/timer_clock_isolate.dart.bak';
 import '../utils/file_operator_util.dart';
 import '../utils/list_view_item_builder.dart';
 
 class HomePageBackupedListWidget extends StatefulWidget {
-  const HomePageBackupedListWidget({Key? key, required this.title}) : super(key: key);
+  const HomePageBackupedListWidget({Key? key, required this.title})
+      : super(key: key);
 
   final String title;
   @override
@@ -21,8 +22,8 @@ class HomePageBackupedListWidget extends StatefulWidget {
       _HomePageBackupedListWidgetState();
 }
 
-class _HomePageBackupedListWidgetState
-    extends State<HomePageBackupedListWidget> with TickerProviderStateMixin {
+class _HomePageBackupedListWidgetState extends State<HomePageBackupedListWidget>
+    with TickerProviderStateMixin {
   // todo 改为从配置文件中读取常量
   String _API_ADDRESS = "https://openapi.alipan.com";
   String _SCHEME = "https";
